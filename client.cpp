@@ -16,7 +16,8 @@
 #include <fstream>
 #include <sstream>
 #include <sys/mman.h>
-#define PORT 12345
+#include <sys/uio.h>
+#define PORT "12345"
 
 
 
@@ -26,6 +27,11 @@ int main(int argc , char *argv[])
   struct addrinfo hints;
   struct addrinfo * result;
 
+  memset(&hints, 0, sizeof hints); // make sure the struct is empty
+  hints.ai_family = AF_UNSPEC;     // don't care IPv4 or IPv6
+  hints.ai_socktype=SOCK_DGRAM;
+  hints.ai_protocol=0;
+  hints.ai_flags = AI_PASSIVE;     // fill in my IP for me // consider removing so you dont use bind
 
     if (argc !=  5){
       std::cout << "bad arguments" << std::endl;
@@ -37,26 +43,13 @@ int main(int argc , char *argv[])
     char* message = argv[1];
 
 
-    //first do inet_pton with ipv4
-    struct sockaddr_in addr;
-    addr.sin_family = AF_INET;
-    addr.sin_port = htons(PORT);
-    if (
-    inet_pton(AF_INET, argv[1], &addr.sin_addr) != 1
-    ) {
-      //if that fails then inet_pton with ipv6
-      struct sockaddr_in6 addr;
-      addr.sin6_family = AF_INET6;
-      addr.sin6_port = htons(12345);
-      if (
-      inet_pton(AF_INET6, argv[1], &addr.sin6_addr) != 1
-      ) {
-        memset(&hints, 0, sizeof(hints));
-        
-      	std::cout << "probably a hostname" << std::endl;
-      }
-
+    int err=getaddrinfo(address,PORT,&hints,&result);
+    if (err!=0) {
+        std::cout << "failed to resolve remote socket address " << err << std::endl;
     }
+
+    //first do inet_pton with ipv4
+
 
     //past to getaddrinfo
     //getaddrinfo
