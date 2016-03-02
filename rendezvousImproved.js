@@ -2,12 +2,12 @@
  * rendezvous.js
  * Andrew Armenia
  * 3-1-2015
- * 
+ *
  * Rendezvous server for Network Programming Homework 1.
  * Listens on udp port 12345.
- * 
+ *
  * Run this server as: node rendezvous.js.
- * 
+ *
  * DO NOT USE NODE.JS TO WRITE YOUR SOLUTION
  * YOUR SUBMISSION MUST BE IN C OR C++!
  */
@@ -24,11 +24,11 @@ s.bind(12345);
 
 // handle incoming messages
 s.on('message', function(msg, rinfo) {
-        console.log(`server got: ${msg} from ${rinfo.address}:${rinfo.port}`);
+  console.log('server got: ' + msg + 'from ' + rinfo.address + ':' + rinfo.port);
 	var rhost = rinfo.address;
 	var rport = rinfo.port;
 	var raddr = rhost + " " + rport;
-	
+
 	// parse the request
 	var match = /^([A-Z_]+) ([A-Za-z0-9_]+)/.exec(msg);
 	if (match) {
@@ -39,7 +39,7 @@ s.on('message', function(msg, rinfo) {
 		if (verb == "REGISTER") {
 			// record peer info in registry
 			console.log(
-				"Registered node %s at address %s", 
+				"Registered node %s at address %s",
 				name, raddr
 			);
 			registry[name] = raddr;
@@ -55,7 +55,7 @@ s.on('message', function(msg, rinfo) {
 				console.log("unknown peer %s", name);
 				result = "NOT FOUND";
 			}
-			
+
 			var packet = new Buffer(result);
 			s.send(packet, 0, packet.length, rport, rhost);
 		} else {
@@ -65,6 +65,7 @@ s.on('message', function(msg, rinfo) {
 	}
 });
 
+//remove if issues
 var dgram = require('dgram');
 var s2 = dgram.createSocket('udp6');
 s2.bind(12346);
